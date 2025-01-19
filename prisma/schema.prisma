@@ -20,6 +20,7 @@ model User {
     locale                  String          
     status                  String          
     pictureurl              String           
+
     sentFriendRequests      FriendRequest[] @relation("sender")          
     receivedFriendRequests  FriendRequest[] @relation("receiver")     
     friendsFirst            Friends[]       @relation("firstSide")
