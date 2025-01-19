@@ -1,17 +1,15 @@
 import { Group, PrismaClient } from "@prisma/client";
 import { randomUUID, UUID } from "crypto";
 import { Router, Request, Response } from "express";
+import prisma from "../prismaclient";
 
 const router = Router();
-
-// TODO: Remove this and figure out how to import the same prismaclient for the whole app in other areas
-const prisma = new PrismaClient();
 
 const generateShareLink = () => {
     return "INSERTLINKHERE";
 };
 // GET groups that the user is currently in
-router.get("/groups", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
     const groupData: Group[] = [];
     const groups = await prisma.groupMember.findMany({
         select: { group: true },

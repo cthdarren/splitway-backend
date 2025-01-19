@@ -2,8 +2,10 @@ import { Group, PrismaClient, User } from "@prisma/client";
 import { Request, Response } from "express";
 import "dotenv/config";
 import { randomBytes, randomUUID } from "crypto";
+import groupRoutes from './routes/groups'
+import prisma from "./prismaclient";
 
-const prisma = new PrismaClient();
+
 const express = require("express");
 
 const app = express();
@@ -12,6 +14,11 @@ const app = express();
 // wasted so much time trying to figure out why
 // it kept returning undefined bruh
 app.use(express.json())
+
+//===============================================
+//                  Routes
+//===============================================
+app.use('/groups', groupRoutes)
 
 const cors = require("cors");
 let corsOptions = {
