@@ -1,4 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { Group, PrismaClient } from "@prisma/client";
+import { Request, Response } from "express";
+import 'dotenv/config'
+import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient()
 const express = require("express");
@@ -11,12 +14,23 @@ let corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.get("/testdbconnection", async (req, res) => {
-    const test = await prisma.user.findMany()
+app.get("/testdbconnection", async (req :Request, res :Response) => {
+    const group :Group= await prisma.group.create({
+        data: {
+            name: "Test",
+            id: randomUUID(), 
+            category: "Test",
+            currency: "TES",
+            sharelink: "test",
+            userId: "test"
+        }
+    })
+    const test = await prisma.group.findMany()
     console.log(test)
+    res.send(test)
 })
 
-app.get("/groups/:id", (req, res) => {
+app.get("/groups/:id", (req :Request, res :Response) => {
         const id = req.params.id
         res.send({
             id: id,
@@ -38,7 +52,7 @@ app.get("/groups/:id", (req, res) => {
     console.log("HIT!");
 });
 
-app.get("/expenses/:id", (req, res) => {
+app.get("/expenses/:id", (req :Request, res :Response) => {
     const id = req.params.id
     res.send([
         {

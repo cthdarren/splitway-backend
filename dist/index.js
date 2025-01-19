@@ -1,45 +1,50 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient()
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const client_1 = require("@prisma/client");
+const prisma = new client_1.PrismaClient();
 const express = require("express");
-
 const app = express();
-
 const cors = require("cors");
 let corsOptions = {
     origin: ["http://localhost:8081"]
 };
 app.use(cors(corsOptions));
-
-app.get("/testdbconnection", async (req, res) => {
-    const test = await prisma.user.findMany()
-    console.log(test)
-})
-
+app.get("/testdbconnection", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const test = yield prisma.user.findMany();
+    console.log(test);
+}));
 app.get("/groups/:id", (req, res) => {
-        const id = req.params.id
-        res.send({
-            id: id,
-            name: "Japan Trip" + id,
-            currency: "JPY",
-            expenditure: 500,
-            members: [
-                {
-                    id: 1,
-                    name: "Darren"
-                },
-                {
-                    id: 2,
-                    name: "Jason"
-                },
-                { id: 3, name: "Pin Kang" }
-            ]
-        })
+    const id = req.params.id;
+    res.send({
+        id: id,
+        name: "Japan Trip" + id,
+        currency: "JPY",
+        expenditure: 500,
+        members: [
+            {
+                id: 1,
+                name: "Darren"
+            },
+            {
+                id: 2,
+                name: "Jason"
+            },
+            { id: 3, name: "Pin Kang" }
+        ]
+    });
     console.log("HIT!");
 });
-
 app.get("/expenses/:id", (req, res) => {
-    const id = req.params.id
+    const id = req.params.id;
     res.send([
         {
             id: 1,
@@ -58,8 +63,7 @@ app.get("/expenses/:id", (req, res) => {
         {
             id: 1,
             expenseAmount: 500,
-            expenseName:
-                "Very very very very long expense nameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+            expenseName: "Very very very very long expense nameeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
             groupId: id,
             category: "Food",
             paidBy: "Darren",
@@ -86,7 +90,6 @@ app.get("/expenses/:id", (req, res) => {
         }
     ]);
 });
-
 app.listen(3000, () => {
     console.log("Listening on port 3000");
 });
