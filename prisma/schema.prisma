@@ -7,8 +7,9 @@
 generator client {
   provider = "prisma-client-js"
 }
-datasource db { provider = "postgresql"
-  url      = env("DATABASE_URL")
+datasource db { 
+    provider = "postgresql"
+    url = env("DATABASE_URL")
 }
 
 model User {
@@ -25,13 +26,13 @@ model User {
     receivedFriendRequests  FriendRequest[] @relation("receiver")     
     friendsFirst            Friends[]       @relation("firstSide")
     friendsSecond           Friends[]       @relation("secondSide")
-    groupsCreated           Groups[]
+    groupsCreated           Group[]
     groupsPartOf            GroupMember[] 
     expensesPartOf          ExpenseUser[]
     expensesPaidFor         Expense[]
     
     createdAt               DateTime        @default(now())
-    updatedAt               DateTime        @updatedat
+    updatedAt               DateTime        @updatedAt
 }
 
 model Friends {
@@ -41,7 +42,7 @@ model Friends {
     friend      User            @relation("secondSide", fields: [friendId], references:[id])
 
     createdAt   DateTime        @default(now())
-    updatedAt   DateTime        @updatedat
+    updatedAt   DateTime        @updatedAt
 
     @@id([userId, friendId])
 }
@@ -52,8 +53,10 @@ model FriendRequest {
     requester   User            @relation("sender", fields: [requesterId], references:[id])
     addressee   User            @relation("receiver", fields: [addresseeId], references:[id])
 
-    requestDate datetime        @default(now())
-    updatedAt   datetime        @updatedat
+    requestDate DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+
+    @@id([requesterId, addresseeId])
 }
 
 model Group{
@@ -107,7 +110,7 @@ model ExpenseUser{
     splitAmount Int
 
     createdAt   DateTime        @default(now())
-    updatedAt   DateTime        @updatedat
+    updatedAt   DateTime        @updatedAt
 }
 // model Profile {
 //   id     Int     @id @default(autoincrement())
