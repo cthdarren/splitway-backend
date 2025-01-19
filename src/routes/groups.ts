@@ -22,17 +22,30 @@ router.get("/", async (req: Request, res: Response) => {
     res.send({ success: true, data: groupData });
 });
 
-router.get("/create", async (req: Request, res: Response) => {
+router.post("/create", async (req: Request, res: Response) => {
     const nameFieldEmpty: boolean = req.body.name === undefined;
-    const categoryFieldEmpty: boolean = req.body.name === undefined;
-    const currencyFieldEmpty: boolean = req.body.name === undefined;
-    const userIdFieldEmpty: boolean = req.body.name === undefined;
+    const categoryFieldEmpty: boolean = req.body.category === undefined;
+    const currencyFieldEmpty: boolean = req.body.currency === undefined;
+    const userIdFieldEmpty: boolean = req.body.userId === undefined;
+
+    if (
+        nameFieldEmpty ||
+        categoryFieldEmpty ||
+        currencyFieldEmpty ||
+        userIdFieldEmpty
+    ) {
+        res.send("Please fill in all required fields");
+        return;
+    }
 
     let newGroupId: UUID = randomUUID();
-    while (prisma.group.findUnique({ where: { id: newGroupId } }) !== undefined)
+    while (
+        (await prisma.group.findUnique({ where: { id: newGroupId } })) !== null
+    ) {
         newGroupId = randomUUID();
+    }
 
-    await prisma.$transaction([
+    const transactions = [
         prisma.group.create({
             data: {
                 id: newGroupId,
@@ -40,24 +53,30 @@ router.get("/create", async (req: Request, res: Response) => {
                 category: req.body.category,
                 currency: req.body.currency,
                 sharelink: generateShareLink(),
-                createdBy: req.body.createdBy
+                userId: req.body.userId
             }
         }),
         prisma.groupMember.create({
             data: {
-                userId: req.body.createdBy,
+                userId: req.body.userId,
                 groupId: newGroupId
             }
-        }),
-        req.body.participants.map((participantId: string) => {
-            prisma.groupMember.create({
-                data: {
-                    userId: participantId,
-                    groupId: newGroupId
-                }
-            });
         })
-    ]);
+    ];
+
+    if (req.body.participants !== undefined) {
+        req.body.participants.map((participantId: string) => {
+            transactions.push(
+                prisma.groupMember.create({
+                    data: {
+                        userId: participantId,
+                        groupId: newGroupId
+                    }
+                })
+            );
+        });
+    }
+    await prisma.$transaction(transactions);
 });
 
 export default router;
