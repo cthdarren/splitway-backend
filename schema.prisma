@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-py"
+}
+datasource db { 
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+}
+
+model User {
+    id                      String          @id @db.Uuid
+    username                String          @unique 
+    pwhash                  String          
+    salt                    Bytes           @db.ByteA
+    email                   String          @unique
+    locale                  String          
+    status                  String          
+    pictureurl              String           
+
+    sentFriendRequests      FriendRequest[] @relation("sender")          
+    receivedFriendRequests  FriendRequest[] @relation("receiver")     
+    friendsFirst            Friends[]       @relation("firstSide")
+    friendsSecond           Friends[]       @relation("secondSide")
+    groupsCreated           Group[]
+    groupsPartOf            GroupMember[] 
+    expensesPartOf          ExpenseUser[]
+    expensesPaidFor         Expense[]
+    
+    createdAt               DateTime        @default(now())
+    updatedAt               DateTime        @updatedAt
+}
+
+model Friends {
+    userId      String          @db.Uuid
+    friendId    String          @db.Uuid
+    user        User            @relation("firstSide", fields: [userId], references:[id])
+    friend      User            @relation("secondSide", fields: [friendId], references:[id])
+
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+
+    @@id([userId, friendId])
+}
+
+model FriendRequest {
+    requesterId String          @db.Uuid
+    addresseeId String          @db.Uuid
+    requester   User            @relation("sender", fields: [requesterId], references:[id])
+    addressee   User            @relation("receiver", fields: [addresseeId], references:[id])
+
+    requestDate DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+
+    @@id([requesterId, addresseeId])
+}
+
+model Group{
+    id              String          @id @db.Uuid
+    name            String          
+    category        String          
+    currency        String          
+    sharelink       String          @unique
+
+    expenses        Expense[]
+    groupMembers    GroupMember[]
+    createdBy       User            @relation(fields: [userId], references:[id])
+    userId          String          @db.Uuid
+
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+}
+
+model GroupMember{
+    groupId     String          @db.Uuid
+    userId      String          @db.Uuid
+    group       Group           @relation(fields: [groupId], references: [id])
+    user        User            @relation(fields: [userId], references: [id])
+
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+
+    @@id([groupId, userId])
+}
+
+model Expense{
+    id          String          @id @db.Uuid
+    expenseAmt  Int             
+    category    String
+    splitType   Boolean
+    expenseDate DateTime        @default(now())   
+
+    groupId     String          @db.Uuid
+    userId      String          @db.Uuid
+    paidBy      User            @relation(fields: [userId], references: [id])
+    group       Group           @relation(fields: [groupId], references: [id])
+
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+}
+
+model ExpenseUser{
+    expenseId   String          @id @db.Uuid
+    userId      String          @db.Uuid
+    user        User            @relation(fields: [userId], references: [id])
+    splitAmount Int
+
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+}
+
