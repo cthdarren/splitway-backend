@@ -1,6 +1,4 @@
 from typing import Dict
-from prisma import Prisma
-from pydantic import Json
 from app.prisma.prismaclient import prisma
 
 from prisma.models import Group, User
@@ -16,12 +14,11 @@ router = APIRouter(
 async def getGroups() -> Dict:
     await prisma.connect()
 
-    users :list[User] = await prisma.user.find_many()
-    print(users)
+    groupData :list[Group] = await prisma.group.find_many()
 
     await prisma.disconnect()
 
-    return {'data': users}
+    return {'success': True, 'data': groupData}
 
 
 @router.post("/create")
