@@ -1,9 +1,9 @@
 from prisma import Base64
-from prisma.models import User
 from faker import Faker
 from typing import Optional
 from app.prisma.prismaclient import prisma
 import base64
+
 fake = Faker()
 
 async def create_fake_user(username :Optional[str] = None) -> str:
