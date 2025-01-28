@@ -10,3 +10,5 @@ NOTE: Groups - Expenses should be 1:n
 
 ![image](https://github.com/user-attachments/assets/63fceb81-1ca2-4011-ae7f-1284afbbe18d)
 
+create venv
+install requirements.txt
