@@ -1,8 +1,8 @@
-from typing import Dict
+from typing import Annotated, Dict
 from app.prisma.prismaclient import prisma
 
-from prisma.models import Group, User
-from fastapi import APIRouter
+from prisma.models import Group
+from fastapi import APIRouter, Header
 
 router = APIRouter(
     prefix="/groups",
@@ -22,7 +22,8 @@ async def getGroups() -> Dict:
 
 
 @router.post("/create")
-async def createGroups():
-    return {'data': "POST Groups/Create"}
+async def createGroups(authorization: Annotated[str|None, Header()] = None):
+
+    return {'data': authorization}
 
 
