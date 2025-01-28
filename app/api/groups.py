@@ -1,6 +1,5 @@
 from typing import Annotated, Dict
 
-from prisma.models import Group
 from fastapi import APIRouter, Header
 
 router = APIRouter(
